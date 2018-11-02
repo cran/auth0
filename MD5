@@ -1,0 +1,12 @@
+da6681b414b70faa54e97403fcf99677 *DESCRIPTION
+2cd496ec751fea7ed3303881d0f7fada *LICENSE
+1ae670efed7f914ca4305b61db9eb282 *NAMESPACE
+aa70a6bcf6d210280df54f810d5e4176 *R/auth0.R
+88b4b347b258d48fd9bf4a53d6b40426 *R/shiny.R
+995a65fad0864a082c2db7f415cb5608 *inst/logout/_auth0.yml
+f7daf3c4b700851310593bd1a44b5f4d *inst/logout/app.R
+995a65fad0864a082c2db7f415cb5608 *inst/simple/_auth0.yml
+9603f10f371d5938e06b681454e9db3f *inst/simple/app.R
+58500e7cb6c8128441e7e56fc4df96b7 *man/auth0_logout_url.Rd
+d8d450eb931769dc3543d79b184a2b93 *man/shinyAuth0App.Rd
+545bb62918bb10d90759b7c4c0faa7d9 *man/use_auth0.Rd
