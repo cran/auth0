@@ -1,14 +1,7 @@
-auth0_app_url <- function(config) {
-  if (interactive()) {
-    config$shiny_config$local_url
-  } else {
-    config$shiny_config$remote_url
-  }
-}
-
 auth0_app <- function(app_url, app_name, key, secret) {
-  httr::oauth_app(appname = app_name, key = key, secret = secret,
-                  redirect_uri = app_url)
+  function(app_url) {
+    httr::oauth_app(appname = app_name, key = key, secret = secret, redirect_uri = app_url)
+  }
 }
 
 auth0_api <- function(auth0_url, request, access) {
@@ -17,59 +10,72 @@ auth0_api <- function(auth0_url, request, access) {
 }
 
 has_auth_code <- function(params, state) {
-  !is.null(params$code) && params$state == state
+  is.null(params$error) && !is.null(params$code) && params$state == state
 }
 
 auth0_server_verify <- function(session, app, api, state) {
+
   u_search <- session[["clientData"]]$url_search
   params <- shiny::parseQueryString(u_search)
+
   if (has_auth_code(params, state)) {
-    cred <- httr::oauth2.0_access_token(api, app, params$code)
+    cred <- httr::oauth2.0_access_token(api, app(redirect_uri), params$code)
     token <- httr::oauth2.0_token(
-      app = app, endpoint = api, cache = FALSE, credentials = cred,
+      app = app(redirect_uri), endpoint = api, cache = FALSE, credentials = cred,
       user_params = list(grant_type = "authorization_code"))
 
     userinfo_url <- sub("authorize", "userinfo", api$authorize)
     resp <- httr::GET(userinfo_url, httr::config(token = token))
-    session$userData$login_info <- httr::content(resp, "parsed")
+
+    assign("auth0_credentials", token$credentials, envir = session$userData)
+    assign("auth0_info", httr::content(resp, "parsed"), envir = session$userData)
   }
+
 }
 
 auth0_state <- function(server) {
-  paste(sample(c(letters, 0:9), 10, replace = TRUE), collapse = "")
+  paste(sample(c(letters, LETTERS, 0:9), 10, replace = TRUE), collapse = "")
 }
 
+#' Information used to connect to Auth0.
+#'
+#' Creates a list containing all the important information to connect to Auth0
+#'   service's API.
+#'
+#' @param config path to the `_auth0.yml` file or the object returned by
+#'   [auth0_config]. If not informed, will try to find the file using
+#'   [auth0_find_config_file].
+#'
+#' @seealso [use_auth0] to create an `_auth0.yml` template.
+#'
+#' @return A list contaning scope, state, keys, OAuth2.0 app and endpoints.
+#'
+#' @export
 auth0_info <- function(config) {
+  if (missing(config)) config <- auth0_config()
+  if (!is.list(config) && is.character(config)) config <- auth0_config(config)
   scope <- config$auth0_config$scope
   state <- auth0_state()
   conf <- config$auth0_config
-  app_url <- auth0_app_url(config)
-  app <- auth0_app(app_url, config$name,
-                   conf$credentials$key, conf$credentials$secret)
+  app <- auth0_app(app_name = config$name, key = conf$credentials$key, secret = conf$credentials$secret)
   api <- auth0_api(conf$api_url, conf$request, conf$access)
   list(scope = scope, state = state, app = app, api = api)
 }
 
+#' Parse `_auth0.yml` file.
+#'
+#' Validates and creates a list of useful information from
+#'   the `_auth0.yml` file.
+#'
+#' @param config_file path to the `_auth0.yml` file. If not informed,
+#'   will try to find the file using [auth0_find_config_file].
+#'
+#' @return List containing all the information from the `_auth0.yml` file.
+#'
+#' @export
 auth0_config <- function(config_file) {
+  if (missing(config_file)) config_file <- auth0_find_config_file()
   config <- yaml::read_yaml(config_file, eval.expr = TRUE)
-
-  # standardise and validate shiny_config
-  if (is.null(config$auth0_config)) {
-    stop("Missing 'auth0_config' tag in YAML file.")
-  }
-  if (is.null(config$shiny_config)) {
-    default_url <- "http://localhost:8100"
-    config$shiny_config <- list(local_url = default_url,
-                                remote_url = default_url)
-  } else if (!is.list(config$shiny_config)) {
-    default_url <- config$shiny_config
-    config$shiny_config <- list(local_url = default_url,
-                                emote_url = default_url)
-  } else if (is.null(config$shiny_config$local_url)) {
-    config$shiny_config$local_url <- config$shiny_config$remote_url
-  } else if (is.null(config$shiny_config$remote_url)) {
-    config$shiny_config$remote_url <- config$shiny_config$local_url
-  }
 
   # standardise and validate auth0_config
   if (is.null(config$auth0_config)) {
@@ -80,12 +86,13 @@ auth0_config <- function(config_file) {
   missing_args <- setdiff(required_names, config_names)
   s <- strrep("s", max(length(missing_args) - 1L, 0))
   if (length(missing_args) > 0) {
-    msg <- sprintf("Missing '%s' tag%s in YAML file",
-                   paste(missing_args, collapse = "','"), s)
+    msg <- sprintf("Missing '%s' tag%s in YAML file", paste(missing_args, collapse = "','"), s)
     stop(msg)
   }
-  defaults <- list(scope = "openid profile",
-                   request = "oauth/token", access = "oauth/token")
+  # scope
+  scp <- config$auth0_config$scope
+  if (is.null(scp)) scp <- "openid profile"
+  defaults <- list(scope = scp, request = "oauth/token", access = "oauth/token")
 
   for (nm in names(defaults)) {
     if (!nm %in% config_names) {
@@ -108,9 +115,6 @@ auth0_config <- function(config_file) {
 #' parameters.
 #'
 #' The required parameters are:
-#' - `shiny_config`: an URL to access the app or a list containing `local_url`
-#' (e.g. http://localhost:8100) and `remote_url`
-#' (e.g. https://johndoe.shinyapps.io/app) tags.
 #' - `auth0_config` is a list contaning at least:
 #'   - `api_url`: Your account at Auth0 (e.g. https://jonhdoe.auth0.com).
 #'   It is the "Domain" in Auth0 application settings.
@@ -137,7 +141,8 @@ use_auth0 <- function(path = ".", file = "_auth0.yml", overwrite = FALSE) {
   attr(api_url, "tag") <- "!expr"
   yaml_list <- list(
     name = "myApp",
-    shiny_config = "http://localhost:8100",
     auth0_config = list(api_url = api_url, credentials = ks))
   yaml::write_yaml(yaml_list, f)
 }
+
+
