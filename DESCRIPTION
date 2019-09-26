@@ -1,7 +1,7 @@
 Package: auth0
 Type: Package
 Title: Secure Authentication in Shiny with Auth0
-Version: 0.2.0
+Version: 0.2.1
 Authors@R: c(
     person("Julio", "Trecenti", email = "julio.trecenti@gmail.com", role = "cre"),
     person("Daniel", "Falbel", email = "dfalbel@gmail.com", role = "aut"),
@@ -21,7 +21,7 @@ Imports: httr, shiny, shinyjs, htmltools, yaml, utils
 Suggests: knitr, rmarkdown
 VignetteBuilder: knitr
 NeedsCompilation: no
-Packaged: 2019-09-20 15:18:45 UTC; jt
+Packaged: 2019-09-25 15:10:01 UTC; jt
 Author: Julio Trecenti [cre],
   Daniel Falbel [aut],
   José Jesus [ctb],
@@ -29,4 +29,4 @@ Author: Julio Trecenti [cre],
   C Lente [ctb]
 Maintainer: Julio Trecenti <julio.trecenti@gmail.com>
 Repository: CRAN
-Date/Publication: 2019-09-20 16:40:09 UTC
+Date/Publication: 2019-09-26 08:30:19 UTC
