@@ -1,86 +1,116 @@
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
 
 <head>
 
 <meta charset="utf-8" />
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="generator" content="pandoc" />
 <meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1" />
 
 
 
 <title>auth0 Tutorial</title>
 
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
+
+<style type="text/css">
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+</style>
 
 
-<style type="text/css">code{white-space: pre;}</style>
+
+<style type="text/css">
+code {
+white-space: pre;
+}
+.sourceCode {
+overflow: visible;
+}
+</style>
 <style type="text/css" data-origin="pandoc">
-a.sourceLine { display: inline-block; line-height: 1.25; }
-a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
-a.sourceLine:empty { height: 1.2em; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
 .sourceCode { overflow: visible; }
-code.sourceCode { white-space: pre; position: relative; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
 div.sourceCode { margin: 1em 0; }
 pre.sourceCode { margin: 0; }
 @media screen {
 div.sourceCode { overflow: auto; }
 }
 @media print {
-code.sourceCode { white-space: pre-wrap; }
-a.sourceLine { text-indent: -1em; padding-left: 1em; }
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
 }
-pre.numberSource a.sourceLine
-  { position: relative; left: -4em; }
-pre.numberSource a.sourceLine::before
-  { content: attr(data-line-number);
-    position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; pointer-events: all; display: inline-block;
-    -webkit-touch-callout: none; -webkit-user-select: none;
-    -khtml-user-select: none; -moz-user-select: none;
-    -ms-user-select: none; user-select: none;
-    padding: 0 4px; width: 4em;
-    color: #aaaaaa;
-  }
-pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+pre.numberSource code
+{ counter-reset: source-line 0; }
+pre.numberSource code > span
+{ position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
+}
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
 div.sourceCode
-  {  }
+{ }
 @media screen {
-a.sourceLine::before { text-decoration: underline; }
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
-code span.al { color: #ff0000; font-weight: bold; } /* Alert */
-code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
-code span.at { color: #7d9029; } /* Attribute */
-code span.bn { color: #40a070; } /* BaseN */
-code span.bu { } /* BuiltIn */
-code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
-code span.ch { color: #4070a0; } /* Char */
-code span.cn { color: #880000; } /* Constant */
-code span.co { color: #60a0b0; font-style: italic; } /* Comment */
-code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
-code span.do { color: #ba2121; font-style: italic; } /* Documentation */
-code span.dt { color: #902000; } /* DataType */
-code span.dv { color: #40a070; } /* DecVal */
-code span.er { color: #ff0000; font-weight: bold; } /* Error */
-code span.ex { } /* Extension */
-code span.fl { color: #40a070; } /* Float */
-code span.fu { color: #06287e; } /* Function */
-code span.im { } /* Import */
-code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
-code span.kw { color: #007020; font-weight: bold; } /* Keyword */
-code span.op { color: #666666; } /* Operator */
-code span.ot { color: #007020; } /* Other */
-code span.pp { color: #bc7a00; } /* Preprocessor */
-code span.sc { color: #4070a0; } /* SpecialChar */
-code span.ss { color: #bb6688; } /* SpecialString */
-code span.st { color: #4070a0; } /* String */
-code span.va { color: #19177c; } /* Variable */
-code span.vs { color: #4070a0; } /* VerbatimString */
-code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
-
+code span.al { color: #ff0000; font-weight: bold; } 
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.at { color: #7d9029; } 
+code span.bn { color: #40a070; } 
+code span.bu { color: #008000; } 
+code span.cf { color: #007020; font-weight: bold; } 
+code span.ch { color: #4070a0; } 
+code span.cn { color: #880000; } 
+code span.co { color: #60a0b0; font-style: italic; } 
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.do { color: #ba2121; font-style: italic; } 
+code span.dt { color: #902000; } 
+code span.dv { color: #40a070; } 
+code span.er { color: #ff0000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #40a070; } 
+code span.fu { color: #06287e; } 
+code span.im { color: #008000; font-weight: bold; } 
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.kw { color: #007020; font-weight: bold; } 
+code span.op { color: #666666; } 
+code span.ot { color: #007020; } 
+code span.pp { color: #bc7a00; } 
+code span.sc { color: #4070a0; } 
+code span.ss { color: #bb6688; } 
+code span.st { color: #4070a0; } 
+code span.va { color: #19177c; } 
+code span.vs { color: #4070a0; } 
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } 
 </style>
 <script>
 // apply pandoc div.sourceCode style to pre.sourceCode instead
@@ -89,13 +119,20 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   for (var i = 0; i < sheets.length; i++) {
     if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
     try { var rules = sheets[i].cssRules; } catch (e) { continue; }
-    for (var j = 0; j < rules.length; j++) {
+    var j = 0;
+    while (j < rules.length) {
       var rule = rules[j];
       // check if there is a div.sourceCode rule
-      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
       var style = rule.style.cssText;
       // check if color or background-color is set
-      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
       // replace div.sourceCode by a pre.sourceCode rule
       sheets[i].deleteRule(j);
       sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
@@ -103,6 +140,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   }
 })();
 </script>
+
 
 
 
@@ -116,9 +154,6 @@ padding-right: 2em;
 font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
 font-size: 14px;
 line-height: 1.35;
-}
-#header {
-text-align: center;
 }
 #TOC {
 clear: both;
@@ -287,7 +322,8 @@ code > span.st { color: #d14; }
 code > span.co { color: #888888; font-style: italic; } 
 code > span.ot { color: #007020; } 
 code > span.al { color: #ff0000; font-weight: bold; } 
-code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61717; background-color: #e3d2d2; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
 </style>
 
 
@@ -304,14 +340,18 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 
 
 
-<p>The goal of <code>{auth0}</code> is to implement an authentication scheme to Shiny using OAuth Apps through the freemium service <a href="https://auth0.com">Auth0</a>.</p>
-<p>To create your authenticated shiny app, you need to follow the steps below. The full decription can be found in the <code>README</code> of the <a href="https://curso-r.github.com/auth0">package site</a>.</p>
+<p>The goal of <code>{auth0}</code> is to implement an authentication
+scheme to Shiny using OAuth Apps through the freemium service <a href="https://auth0.com">Auth0</a>.</p>
+<p>To create your authenticated shiny app, you need to follow the steps
+below. The full decription can be found in the <code>README</code> of
+the <a href="https://curso-r.github.io/auth0/">package site</a>.</p>
 <div id="create-an-auth0-account-and-application" class="section level3">
 <h3>Create an Auth0 account and application</h3>
 <ul>
 <li>Go to <a href="https://auth0.com">auth0.com</a></li>
 <li>Click “Sign Up”</li>
-<li>You can create an account with a user name and password combination, or by signing up with your GitHub or Google accounts.</li>
+<li>You can create an account with a user name and password combination,
+or by signing up with your GitHub or Google accounts.</li>
 <li>Click on “+ Create Application”</li>
 <li>Give a name to your app</li>
 <li>Select “Regular Web Applications” and click “Create”</li>
@@ -321,13 +361,18 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 <h3>Configure your application</h3>
 <ul>
 <li>Go to the Settings in your selected application.</li>
-<li>Add <code>http://localhost:8080</code> to the “Allowed Callback URLs”, “Allowed Web Origins” and “Allowed Logout URLs”.
+<li>Add <code>http://localhost:8080</code> to the “Allowed Callback
+URLs”, “Allowed Web Origins” and “Allowed Logout URLs”.
 <ul>
-<li>You can change <code>http://localhost:8080</code> to another port.</li>
+<li>You can change <code>http://localhost:8080</code> to another
+port.</li>
 </ul></li>
-<li>Add the remote server where you are going to deploy your shiny app to the same boxes.
+<li>Add the remote server where you are going to deploy your shiny app
+to the same boxes.
 <ul>
-<li>Just make sure that these addresses are correct. If you are placing your app inside a folder (e.g. <a href="https://johndoe.shinyapps.io/fooBar" class="uri">https://johndoe.shinyapps.io/fooBar</a>), don’t include the folder (<code>fooBar</code>) in “Allowed Web Origins”.</li>
+<li>Just make sure that these addresses are correct. If you are placing
+your app inside a folder (e.g. <a href="https://johndoe.shinyapps.io/fooBar" class="uri">https://johndoe.shinyapps.io/fooBar</a>), don’t include the
+folder (<code>fooBar</code>) in “Allowed Web Origins”.</li>
 </ul></li>
 <li>Click “Save”</li>
 </ul>
@@ -336,22 +381,33 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 <div id="fill-the-_auth0.yml-file" class="section level3">
 <h3>Fill the <code>_auth0.yml</code> file</h3>
 <ul>
-<li>Create a configuration file for your shiny app by calling <code>auth0::use_auth0()</code>:</li>
+<li>Create a configuration file for your shiny app by calling
+<code>auth0::use_auth0()</code>:</li>
 </ul>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1">auth0<span class="op">::</span><span class="kw">use_auth0</span>()</a></code></pre></div>
-<p>You can set the directory where this file will be created using the <code>path=</code> parameter. See <code>?auth0::use_auth0</code> for details. Your <code>_auth0.yml</code> file should be like this:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode yml"><code class="sourceCode yaml"><a class="sourceLine" id="cb2-1" data-line-number="1"><span class="fu">name:</span><span class="at"> myApp</span></a>
-<a class="sourceLine" id="cb2-2" data-line-number="2"><span class="fu">auth0_config:</span></a>
-<a class="sourceLine" id="cb2-3" data-line-number="3">  <span class="fu">api_url:</span><span class="at"> !expr paste0('https://', Sys.getenv(&quot;AUTH0_USER&quot;), '.auth0.com')</span></a>
-<a class="sourceLine" id="cb2-4" data-line-number="4">  <span class="fu">credentials:</span></a>
-<a class="sourceLine" id="cb2-5" data-line-number="5">    <span class="fu">key:</span><span class="at"> !expr Sys.getenv(&quot;AUTH0_KEY&quot;)</span></a>
-<a class="sourceLine" id="cb2-6" data-line-number="6">    <span class="fu">secret:</span><span class="at"> !expr Sys.getenv(&quot;AUTH0_SECRET&quot;)</span></a></code></pre></div>
-<p>Run <code>usethis::edit_r_environ()</code> and add these three environment variables:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>auth0<span class="sc">::</span><span class="fu">use_auth0</span>()</span></code></pre></div>
+<p>You can set the directory where this file will be created using the
+<code>path=</code> parameter. See <code>?auth0::use_auth0</code> for
+details. Your <code>_auth0.yml</code> file should be like this:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode yml"><code class="sourceCode yaml"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">name</span><span class="kw">:</span><span class="at"> myApp</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">auth0_config</span><span class="kw">:</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">api_url</span><span class="kw">:</span><span class="at"> !expr paste0(&#39;https://&#39;, Sys.getenv(&quot;AUTH0_USER&quot;), &#39;.auth0.com&#39;)</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">credentials</span><span class="kw">:</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">key</span><span class="kw">:</span><span class="at"> !expr Sys.getenv(&quot;AUTH0_KEY&quot;)</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">secret</span><span class="kw">:</span><span class="at"> !expr Sys.getenv(&quot;AUTH0_SECRET&quot;)</span></span></code></pre></div>
+<p>Run <code>usethis::edit_r_environ()</code> and add these three
+environment variables:</p>
 <pre><code>AUTH0_USER=johndoe
 AUTH0_KEY=5wugt0W...
 AUTH0_SECRET=rcaJ0p8...</code></pre>
-<p>There’s how you identify each of them (see the image below):<code>AUTH0_USER</code> is your username, which can be found on the top corner of the site. <code>AUTH0_KEY</code> is your Client ID, which can be copied from inside the app page. <code>AUTH0_SECRET</code> is your Client Secret, which can be copied from the app page.</p>
-<p>You can find more information about environment variables <a href="https://csgillespie.github.io/efficientR/set-up.html#renviron">here</a>. You can also fill these information directly in the <code>_auth0.yml</code> file (see below). If you do so, don’t forget to save the <code>_auth0.yml</code> file after editing it.</p>
+<p>There’s how you identify each of them (see the image
+below):<code>AUTH0_USER</code> is your username, which can be found on
+the top corner of the site. <code>AUTH0_KEY</code> is your Client ID,
+which can be copied from inside the app page. <code>AUTH0_SECRET</code>
+is your Client Secret, which can be copied from the app page.</p>
+<p>You can find more information about environment variables <a href="https://csgillespie.github.io/efficientR/set-up.html#renviron">here</a>.
+You can also fill these information directly in the
+<code>_auth0.yml</code> file (see below). If you do so, don’t forget to
+save the <code>_auth0.yml</code> file after editing it.</p>
 <ul>
 <li>Save and <strong>restart your session</strong>.</li>
 </ul>
@@ -359,28 +415,33 @@ AUTH0_SECRET=rcaJ0p8...</code></pre>
 <div id="create-your-app" class="section level3">
 <h3>Create your app</h3>
 <p>Write a simple shiny app in a <code>app.R</code> file, like this:</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1"><span class="kw">library</span>(shiny)</a>
-<a class="sourceLine" id="cb4-2" data-line-number="2"></a>
-<a class="sourceLine" id="cb4-3" data-line-number="3">ui &lt;-<span class="st"> </span><span class="kw">fluidPage</span>(</a>
-<a class="sourceLine" id="cb4-4" data-line-number="4">  <span class="kw">fluidRow</span>(<span class="kw">plotOutput</span>(<span class="st">&quot;plot&quot;</span>))</a>
-<a class="sourceLine" id="cb4-5" data-line-number="5">)</a>
-<a class="sourceLine" id="cb4-6" data-line-number="6">  </a>
-<a class="sourceLine" id="cb4-7" data-line-number="7">server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output, session) {</a>
-<a class="sourceLine" id="cb4-8" data-line-number="8">  output<span class="op">$</span>plot &lt;-<span class="st"> </span><span class="kw">renderPlot</span>({</a>
-<a class="sourceLine" id="cb4-9" data-line-number="9">    <span class="kw">plot</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">10</span>)</a>
-<a class="sourceLine" id="cb4-10" data-line-number="10">  })</a>
-<a class="sourceLine" id="cb4-11" data-line-number="11">}</a>
-<a class="sourceLine" id="cb4-12" data-line-number="12"></a>
-<a class="sourceLine" id="cb4-13" data-line-number="13"><span class="co"># note that here we're using a different version of shinyApp!</span></a>
-<a class="sourceLine" id="cb4-14" data-line-number="14">auth0<span class="op">::</span><span class="kw">shinyAppAuth0</span>(ui, server)</a></code></pre></div>
-<p><strong>Note</strong>: If you want to use a different path to the <code>auth0</code> configuration file, you can either pass it to <code>shinyAppAuth0()</code> or set the <code>auth0_config_file</code> option by running <code>options(auth0_config_file = &quot;path/to/file&quot;)</code>.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(shiny)</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>ui <span class="ot">&lt;-</span> <span class="fu">fluidPage</span>(</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fluidRow</span>(<span class="fu">plotOutput</span>(<span class="st">&quot;plot&quot;</span>))</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>server <span class="ot">&lt;-</span> <span class="cf">function</span>(input, output, session) {</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>  output<span class="sc">$</span>plot <span class="ot">&lt;-</span> <span class="fu">renderPlot</span>({</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">plot</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>)</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>  })</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a><span class="co"># note that here we&#39;re using a different version of shinyApp!</span></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>auth0<span class="sc">::</span><span class="fu">shinyAppAuth0</span>(ui, server)</span></code></pre></div>
+<p><strong>Note</strong>: If you want to use a different path to the
+<code>auth0</code> configuration file, you can either pass it to
+<code>shinyAppAuth0()</code> or set the <code>auth0_config_file</code>
+option by running
+<code>options(auth0_config_file = &quot;path/to/file&quot;)</code>.</p>
 </div>
 <div id="run" class="section level3">
 <h3>Run!</h3>
 <p>You can try your app running</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" data-line-number="1"><span class="kw">options</span>(<span class="dt">shiny.port =</span> <span class="dv">8080</span>)</a>
-<a class="sourceLine" id="cb5-2" data-line-number="2">shiny<span class="op">::</span><span class="kw">runApp</span>(<span class="st">&quot;app/directory/&quot;</span>)</a></code></pre></div>
-<p>If everything is OK, you should be forwarded to a login page and, after logging in or signing up, you’ll be redirected to your app.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">options</span>(<span class="at">shiny.port =</span> <span class="dv">8080</span>)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>shiny<span class="sc">::</span><span class="fu">runApp</span>(<span class="st">&quot;app/directory/&quot;</span>)</span></code></pre></div>
+<p>If everything is OK, you should be forwarded to a login page and,
+after logging in or signing up, you’ll be redirected to your app.</p>
 </div>
 
 

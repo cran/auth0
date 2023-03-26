@@ -25,7 +25,12 @@ auth0_server_verify <- function(session, app, api, state) {
       user_params = list(grant_type = "authorization_code"))
 
     userinfo_url <- sub("authorize", "userinfo", api$authorize)
-    resp <- httr::GET(userinfo_url, httr::config(token = token))
+    resp <- httr::RETRY(
+      verb = "GET"
+      , url = userinfo_url
+      , httr::config(token = token)
+      , times = 5
+    )
 
     assign("auth0_credentials", token$credentials, envir = session$userData)
     assign("auth0_info", httr::content(resp, "parsed"), envir = session$userData)
@@ -48,8 +53,10 @@ auth0_state <- function(server) {
 #'
 #' @seealso [use_auth0] to create an `_auth0.yml` template.
 #'
-#' @return A list contaning scope, state, keys, OAuth2.0 app, endpoints and
-#'   remote URL.
+#' @return A list contaning scope, state, keys, OAuth2.0 app, endpoints,
+#'   audience and
+#'   remote URL. For compatibility reasons, `remote_url` can be either a parameter
+#'   in the root yaml or inside a `shiny_config` parameter.
 #'
 #' @export
 auth0_info <- function(config) {
@@ -60,7 +67,12 @@ auth0_info <- function(config) {
   conf <- config$auth0_config
   app <- auth0_app(app_name = config$name, key = conf$credentials$key, secret = conf$credentials$secret)
   api <- auth0_api(conf$api_url, conf$request, conf$access)
-  list(scope = scope, state = state, app = app, api = api, remote_url = config$remote_url)
+  audience <- conf$audience
+  rurl <- config$remote_url
+  # backward compatibility
+  if (is.null(rurl)) rurl <- config$shiny_config$remote_url
+  list(scope = scope, state = state, app = app, api = api, audience=audience,
+       remote_url = rurl)
 }
 
 #' Parse `_auth0.yml` file.
@@ -124,6 +136,7 @@ auth0_config <- function(config_file) {
 #'     - `secret`: the Client Secret in Auth0 application settings.
 #'
 #' The extra parameters are:
+#' - `remote_url`: If you are using Shiny-Server or ShinyApps IO service.
 #' - `scope`: The information that Auth0 app will access.
 #' Defaults to "openid profile".
 #' - `request`: Endpoit to request a token. Defaults to "oauth/token"
